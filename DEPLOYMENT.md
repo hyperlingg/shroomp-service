@@ -128,10 +128,12 @@ Update the `GCP_REGION` secret to deploy to a different region:
 Add to the `gcloud run deploy` command:
 
 ```yaml
---set-env-vars "PORT=8080,ENV=production,LOG_LEVEL=info"
+--set-env-vars "ENV=production,LOG_LEVEL=info"
 ```
 
-Or use secrets:
+**Note:** Do not set `PORT` - Cloud Run automatically sets this variable and it cannot be overridden.
+
+For sensitive data, use secrets:
 
 ```yaml
 --set-secrets "API_KEY=api-key:latest"
