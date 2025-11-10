@@ -75,6 +75,16 @@ To persist data outside the container, mount a volume:
 docker run -d -p 8080:8080 -v $(pwd)/data:/root --name service service:latest
 ```
 
+### Option 4: Deploy to Google Cloud Run
+
+For production deployment with automatic CI/CD:
+
+1. Set up GitHub Actions secrets (see [DEPLOYMENT.md](./DEPLOYMENT.md))
+2. Push to `main` branch or trigger workflow manually
+3. Service deploys automatically to Cloud Run
+
+See **[DEPLOYMENT.md](./DEPLOYMENT.md)** for complete setup instructions.
+
 ## API Endpoints
 
 | Method | Endpoint | Description |
@@ -184,5 +194,22 @@ To further customize the data model:
 
 ## Configuration
 
-- **Port:** Default is `8080` (can be modified in `main.go:21`)
+- **Port:** Default is `8080` (configurable via `PORT` environment variable for Cloud Run)
 - **Data file:** Default is `data.json` (can be modified in `storage/storage.go:27`)
+
+## Production Deployment
+
+For production deployment to Google Cloud Run with automated CI/CD via GitHub Actions, see **[DEPLOYMENT.md](./DEPLOYMENT.md)**.
+
+Key features:
+- Automatic deployment on push to `main`
+- Container image storage in Google Artifact Registry
+- Auto-scaling from 0 to 10 instances
+- Pay-per-request pricing (~$0.50-$2/month for low traffic)
+
+**Note:** Cloud Run is stateless. For production, consider migrating from `data.json` to:
+- Cloud Storage (file-based)
+- Cloud SQL (relational database)
+- Firestore (NoSQL database)
+
+See DEPLOYMENT.md for data persistence options.

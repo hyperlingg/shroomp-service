@@ -3,6 +3,7 @@ package main
 import (
 	"log"
 	"net/http"
+	"os"
 
 	"service/handlers"
 	"service/storage"
@@ -43,11 +44,16 @@ func main() {
 	// Wrap mux with CORS middleware
 	handler := corsMiddleware(mux)
 
+	// Get port from environment variable (for Cloud Run) or default to 8080
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = "8080"
+	}
+
 	// Start server
-	port := ":8080"
 	log.Printf("Server starting on port %s", port)
 	log.Printf("CORS enabled for all origins")
-	if err := http.ListenAndServe(port, handler); err != nil {
+	if err := http.ListenAndServe(":"+port, handler); err != nil {
 		log.Fatal("Server failed to start:", err)
 	}
 }
