@@ -11,12 +11,15 @@ func TestStore_Create(t *testing.T) {
 	store := createTestStore(t)
 	defer cleanupTestStore(store)
 
+	now := time.Now()
 	item := models.Item{
-		ID:          "test-1",
-		Name:        "Test Item",
-		Description: "Test Description",
-		CreatedAt:   time.Now(),
-		UpdatedAt:   time.Now(),
+		ID:           "test-1",
+		MushroomName: "Boletus edulis",
+		Location:     "Pacific Northwest",
+		Count:        3,
+		DateTime:     now,
+		CreatedAt:    now,
+		UpdatedAt:    now,
 	}
 
 	err := store.Create(item)
@@ -33,8 +36,8 @@ func TestStore_Create(t *testing.T) {
 	if retrieved.ID != item.ID {
 		t.Errorf("Expected ID %s, got %s", item.ID, retrieved.ID)
 	}
-	if retrieved.Name != item.Name {
-		t.Errorf("Expected Name %s, got %s", item.Name, retrieved.Name)
+	if retrieved.MushroomName != item.MushroomName {
+		t.Errorf("Expected MushroomName %s, got %s", item.MushroomName, retrieved.MushroomName)
 	}
 }
 
@@ -42,9 +45,12 @@ func TestStore_CreateDuplicate(t *testing.T) {
 	store := createTestStore(t)
 	defer cleanupTestStore(store)
 
+	now := time.Now()
 	item := models.Item{
-		ID:   "test-1",
-		Name: "Test Item",
+		ID:       "test-1",
+		Location: "Test Location",
+		Count:    1,
+		DateTime: now,
 	}
 
 	// First create should succeed
@@ -64,9 +70,12 @@ func TestStore_Get(t *testing.T) {
 	store := createTestStore(t)
 	defer cleanupTestStore(store)
 
+	now := time.Now()
 	item := models.Item{
-		ID:   "test-1",
-		Name: "Test Item",
+		ID:       "test-1",
+		Location: "Test Location",
+		Count:    1,
+		DateTime: now,
 	}
 
 	store.Create(item)
@@ -95,10 +104,11 @@ func TestStore_GetAll(t *testing.T) {
 	store := createTestStore(t)
 	defer cleanupTestStore(store)
 
+	now := time.Now()
 	items := []models.Item{
-		{ID: "test-1", Name: "Item 1"},
-		{ID: "test-2", Name: "Item 2"},
-		{ID: "test-3", Name: "Item 3"},
+		{ID: "test-1", MushroomName: "Item 1", Location: "Location 1", Count: 1, DateTime: now},
+		{ID: "test-2", MushroomName: "Item 2", Location: "Location 2", Count: 2, DateTime: now},
+		{ID: "test-3", MushroomName: "Item 3", Location: "Location 3", Count: 3, DateTime: now},
 	}
 
 	for _, item := range items {
@@ -137,18 +147,23 @@ func TestStore_Update(t *testing.T) {
 	store := createTestStore(t)
 	defer cleanupTestStore(store)
 
+	now := time.Now()
 	item := models.Item{
-		ID:          "test-1",
-		Name:        "Original Name",
-		Description: "Original Description",
+		ID:           "test-1",
+		MushroomName: "Original Name",
+		Location:     "Original Location",
+		Count:        1,
+		DateTime:     now,
 	}
 
 	store.Create(item)
 
 	updatedItem := models.Item{
-		ID:          "test-1",
-		Name:        "Updated Name",
-		Description: "Updated Description",
+		ID:           "test-1",
+		MushroomName: "Updated Name",
+		Location:     "Updated Location",
+		Count:        5,
+		DateTime:     now,
 	}
 
 	err := store.Update(item.ID, updatedItem)
@@ -157,11 +172,14 @@ func TestStore_Update(t *testing.T) {
 	}
 
 	retrieved, _ := store.Get(item.ID)
-	if retrieved.Name != updatedItem.Name {
-		t.Errorf("Expected Name %s, got %s", updatedItem.Name, retrieved.Name)
+	if retrieved.MushroomName != updatedItem.MushroomName {
+		t.Errorf("Expected MushroomName %s, got %s", updatedItem.MushroomName, retrieved.MushroomName)
 	}
-	if retrieved.Description != updatedItem.Description {
-		t.Errorf("Expected Description %s, got %s", updatedItem.Description, retrieved.Description)
+	if retrieved.Location != updatedItem.Location {
+		t.Errorf("Expected Location %s, got %s", updatedItem.Location, retrieved.Location)
+	}
+	if retrieved.Count != updatedItem.Count {
+		t.Errorf("Expected Count %d, got %d", updatedItem.Count, retrieved.Count)
 	}
 }
 
@@ -169,9 +187,12 @@ func TestStore_UpdateNotFound(t *testing.T) {
 	store := createTestStore(t)
 	defer cleanupTestStore(store)
 
+	now := time.Now()
 	item := models.Item{
-		ID:   "non-existent",
-		Name: "Test",
+		ID:       "non-existent",
+		Location: "Test",
+		Count:    1,
+		DateTime: now,
 	}
 
 	err := store.Update(item.ID, item)
@@ -184,9 +205,12 @@ func TestStore_Delete(t *testing.T) {
 	store := createTestStore(t)
 	defer cleanupTestStore(store)
 
+	now := time.Now()
 	item := models.Item{
-		ID:   "test-1",
-		Name: "Test Item",
+		ID:       "test-1",
+		Location: "Test Location",
+		Count:    1,
+		DateTime: now,
 	}
 
 	store.Create(item)
@@ -223,9 +247,10 @@ func TestStore_Persistence(t *testing.T) {
 	}
 	defer os.Remove(testFile)
 
+	now := time.Now()
 	items := []models.Item{
-		{ID: "test-1", Name: "Item 1", Description: "Description 1"},
-		{ID: "test-2", Name: "Item 2", Description: "Description 2"},
+		{ID: "test-1", MushroomName: "Item 1", Location: "Location 1", Count: 1, DateTime: now},
+		{ID: "test-2", MushroomName: "Item 2", Location: "Location 2", Count: 2, DateTime: now},
 	}
 
 	for _, item := range items {
@@ -255,11 +280,11 @@ func TestStore_Persistence(t *testing.T) {
 		if err != nil {
 			t.Errorf("Failed to get item %s after load: %v", item.ID, err)
 		}
-		if retrieved.Name != item.Name {
-			t.Errorf("Expected Name %s, got %s", item.Name, retrieved.Name)
+		if retrieved.MushroomName != item.MushroomName {
+			t.Errorf("Expected MushroomName %s, got %s", item.MushroomName, retrieved.MushroomName)
 		}
-		if retrieved.Description != item.Description {
-			t.Errorf("Expected Description %s, got %s", item.Description, retrieved.Description)
+		if retrieved.Location != item.Location {
+			t.Errorf("Expected Location %s, got %s", item.Location, retrieved.Location)
 		}
 	}
 }

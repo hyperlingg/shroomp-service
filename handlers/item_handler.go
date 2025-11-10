@@ -55,12 +55,32 @@ func (h *ItemHandler) HandleItemByID(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// validateSighting validates required fields for a mushroom sighting
+func validateSighting(item *models.Item) error {
+	if item.Location == "" {
+		return errors.New("location is required")
+	}
+	if item.Count < 1 {
+		return errors.New("count must be at least 1")
+	}
+	if item.DateTime.IsZero() {
+		return errors.New("dateTime is required")
+	}
+	return nil
+}
+
 // createItem creates a new item
 func (h *ItemHandler) createItem(w http.ResponseWriter, r *http.Request) {
 	var item models.Item
 
 	if err := json.NewDecoder(r.Body).Decode(&item); err != nil {
 		http.Error(w, "Invalid request body", http.StatusBadRequest)
+		return
+	}
+
+	// Validate required fields
+	if err := validateSighting(&item); err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
@@ -120,6 +140,12 @@ func (h *ItemHandler) updateItem(w http.ResponseWriter, r *http.Request, id stri
 
 	if err := json.NewDecoder(r.Body).Decode(&item); err != nil {
 		http.Error(w, "Invalid request body", http.StatusBadRequest)
+		return
+	}
+
+	// Validate required fields
+	if err := validateSighting(&item); err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 

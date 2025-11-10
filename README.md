@@ -79,11 +79,87 @@ docker run -d -p 8080:8080 -v $(pwd)/data:/root --name service service:latest
 
 | Method | Endpoint | Description |
 |--------|----------|-------------|
-| POST | `/items` | Create a new item |
-| GET | `/items` | Get all items |
-| GET | `/items/{id}` | Get item by ID |
-| PUT | `/items/{id}` | Update an item |
-| DELETE | `/items/{id}` | Delete an item |
+| POST | `/items` | Create a new mushroom sighting |
+| GET | `/items` | Get all sightings |
+| GET | `/items/{id}` | Get sighting by ID |
+| PUT | `/items/{id}` | Update a sighting |
+| DELETE | `/items/{id}` | Delete a sighting |
+
+## Data Model
+
+The service uses a `MushroomSighting` model designed to match the UI's data structure:
+
+```json
+{
+  "id": "550e8400-e29b-41d4-a716-446655440000",
+  "image": "data:image/jpeg;base64,...",
+  "mushroomName": "Boletus edulis",
+  "dateTime": "2025-11-09T19:24:00Z",
+  "location": "Pacific Northwest forest",
+  "count": 5,
+  "created_at": "2025-11-09T19:24:10Z",
+  "updated_at": "2025-11-09T19:24:10Z"
+}
+```
+
+### Field Descriptions
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `id` | string | Auto-generated | Unique identifier (UUID) |
+| `image` | string | Optional | Base64 encoded image of the mushroom |
+| `mushroomName` | string | Optional | User's identification of the mushroom species |
+| `dateTime` | timestamp | **Required** | When the mushroom was found (ISO 8601) |
+| `location` | string | **Required** | Where the mushroom was found |
+| `count` | integer | **Required** | Number of mushrooms found (minimum 1) |
+| `created_at` | timestamp | Auto-generated | When the record was created |
+| `updated_at` | timestamp | Auto-generated | When the record was last updated |
+
+## Example Requests
+
+### Create a new sighting
+
+```bash
+curl -X POST http://localhost:8080/items \
+  -H "Content-Type: application/json" \
+  -d '{
+    "mushroomName": "Boletus edulis",
+    "dateTime": "2025-11-09T14:30:00Z",
+    "location": "Pacific Northwest forest",
+    "count": 3
+  }'
+```
+
+### Get all sightings
+
+```bash
+curl http://localhost:8080/items
+```
+
+### Get a specific sighting
+
+```bash
+curl http://localhost:8080/items/550e8400-e29b-41d4-a716-446655440000
+```
+
+### Update a sighting
+
+```bash
+curl -X PUT http://localhost:8080/items/550e8400-e29b-41d4-a716-446655440000 \
+  -H "Content-Type: application/json" \
+  -d '{
+    "mushroomName": "King Bolete",
+    "dateTime": "2025-11-09T14:30:00Z",
+    "location": "Pacific Northwest forest, near oak trees",
+    "count": 5
+  }'
+```
+
+### Delete a sighting
+
+```bash
+curl -X DELETE http://localhost:8080/items/550e8400-e29b-41d4-a716-446655440000
+```
 
 ## Testing
 
@@ -97,11 +173,14 @@ Data is automatically persisted to `data.json` in the working directory. The fil
 
 ## Customizing the Data Model
 
-To use your own data structure instead of the default `Item` model:
+The service currently uses a `MushroomSighting` model optimized for mushroom identification tracking. An `Item` type alias is maintained for backwards compatibility.
+
+To further customize the data model:
 
 1. Update `models/item.go` with your struct definition
 2. Ensure your struct has JSON tags for serialization
-3. The CRUD operations will automatically work with your new model
+3. Update validation in `handlers/item_handler.go` if needed
+4. The CRUD operations will automatically work with your new model
 
 ## Configuration
 
