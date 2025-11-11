@@ -45,8 +45,12 @@ jobs:
         run: |
           COVERAGE=$(go tool cover -func=coverage.txt | grep total | awk '{print substr($3, 1, length($3)-1)}')
           echo "Total coverage: ${COVERAGE}%"
-          if (( $(echo "$COVERAGE < 50" | bc -l) )); then
-            echo "Warning: Test coverage is below 50%"
+          THRESHOLD=60
+          if (( $(echo "$COVERAGE < $THRESHOLD" | bc -l) )); then
+            echo "❌ Test coverage ${COVERAGE}% is below required threshold of ${THRESHOLD}%"
+            exit 1
+          else
+            echo "✅ Test coverage ${COVERAGE}% meets threshold of ${THRESHOLD}%"
           fi
 
   lint:
