@@ -91,4 +91,5 @@ jobs:
       - name: Verify binary
         run: |
           go build -o shroomp-service .
-          ./shroomp-service --help || echo "Service binary built successfully"
+          test -f shroomp-service && echo "✓ Binary built successfully"
+          file shroomp-service
