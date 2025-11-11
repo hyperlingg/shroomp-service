@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"os"
+	"service/logger"
 	"service/models"
 	"sync"
 )
@@ -26,7 +27,17 @@ func NewStore() *Store {
 		items:    make(map[string]models.Item),
 		filepath: "data.json",
 	}
-	s.load()
+	if err := s.load(); err != nil {
+		logger.Error("Failed to load data from file", map[string]interface{}{
+			"error":    err.Error(),
+			"filepath": s.filepath,
+		})
+	} else {
+		logger.Info("Storage initialized", map[string]interface{}{
+			"filepath":   s.filepath,
+			"item_count": len(s.items),
+		})
+	}
 	return s
 }
 
@@ -52,10 +63,22 @@ func (s *Store) load() error {
 func (s *Store) save() error {
 	data, err := json.MarshalIndent(s.items, "", "  ")
 	if err != nil {
+		logger.Error("Failed to marshal items", map[string]interface{}{
+			"error":      err.Error(),
+			"item_count": len(s.items),
+		})
 		return err
 	}
 
-	return os.WriteFile(s.filepath, data, 0644)
+	if err := os.WriteFile(s.filepath, data, 0644); err != nil {
+		logger.Error("Failed to write data to file", map[string]interface{}{
+			"error":    err.Error(),
+			"filepath": s.filepath,
+		})
+		return err
+	}
+
+	return nil
 }
 
 // Create adds a new item to the store

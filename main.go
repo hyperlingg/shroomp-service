@@ -1,11 +1,11 @@
 package main
 
 import (
-	"log"
 	"net/http"
 	"os"
 
 	"service/handlers"
+	"service/logger"
 	"service/storage"
 )
 
@@ -51,9 +51,16 @@ func main() {
 	}
 
 	// Start server
-	log.Printf("Server starting on port %s", port)
-	log.Printf("CORS enabled for all origins")
+	logger.Info("Server starting", map[string]interface{}{
+		"port": port,
+	})
+	logger.Info("CORS configuration", map[string]interface{}{
+		"enabled": true,
+		"origins": "*",
+	})
 	if err := http.ListenAndServe(":"+port, handler); err != nil {
-		log.Fatal("Server failed to start:", err)
+		logger.Fatal("Server failed to start", map[string]interface{}{
+			"error": err.Error(),
+		})
 	}
 }

@@ -3,11 +3,11 @@ package handlers
 import (
 	"encoding/json"
 	"errors"
-	"log"
 	"net/http"
 	"strings"
 	"time"
 
+	"service/logger"
 	"service/models"
 	"service/storage"
 
@@ -99,7 +99,11 @@ func (h *ItemHandler) createItem(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, "Item already exists", http.StatusConflict)
 			return
 		}
-		log.Printf("Error creating item: %v", err)
+		logger.Error("Error creating item", map[string]interface{}{
+			"error":    err.Error(),
+			"item_id":  item.ID,
+			"location": item.Location,
+		})
 		http.Error(w, "Internal server error", http.StatusInternalServerError)
 		return
 	}
@@ -125,7 +129,10 @@ func (h *ItemHandler) getItem(w http.ResponseWriter, r *http.Request, id string)
 			http.Error(w, "Item not found", http.StatusNotFound)
 			return
 		}
-		log.Printf("Error getting item: %v", err)
+		logger.Error("Error getting item", map[string]interface{}{
+			"error":   err.Error(),
+			"item_id": id,
+		})
 		http.Error(w, "Internal server error", http.StatusInternalServerError)
 		return
 	}
@@ -158,7 +165,11 @@ func (h *ItemHandler) updateItem(w http.ResponseWriter, r *http.Request, id stri
 			http.Error(w, "Item not found", http.StatusNotFound)
 			return
 		}
-		log.Printf("Error updating item: %v", err)
+		logger.Error("Error updating item", map[string]interface{}{
+			"error":    err.Error(),
+			"item_id":  id,
+			"location": item.Location,
+		})
 		http.Error(w, "Internal server error", http.StatusInternalServerError)
 		return
 	}
@@ -174,7 +185,10 @@ func (h *ItemHandler) deleteItem(w http.ResponseWriter, r *http.Request, id stri
 			http.Error(w, "Item not found", http.StatusNotFound)
 			return
 		}
-		log.Printf("Error deleting item: %v", err)
+		logger.Error("Error deleting item", map[string]interface{}{
+			"error":   err.Error(),
+			"item_id": id,
+		})
 		http.Error(w, "Internal server error", http.StatusInternalServerError)
 		return
 	}
