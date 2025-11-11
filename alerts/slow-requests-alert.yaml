@@ -1,0 +1,44 @@
+displayName: "Slow Requests Detected - Shroomp Backend"
+documentation:
+  content: |
+    One or more requests have exceeded 2 seconds response time.
+
+    ## Common Causes:
+    - Large image uploads
+    - Database/storage bottleneck
+    - Cold start delays (first request to new instance)
+    - Network issues
+
+    ## Action Items:
+    1. Check slow_request_latency metric for details
+    2. Review Cloud Run logs for affected endpoints
+    3. Check if storage operations are timing out
+    4. Consider setting min instances to avoid cold starts
+
+    Query slow requests:
+    ```
+    resource.type="cloud_run_revision"
+    resource.labels.service_name="shroomp-backend"
+    httpRequest.latency > "2s"
+    ```
+
+    Dashboard: https://console.cloud.google.com/monitoring
+  mimeType: text/markdown
+conditions:
+  - displayName: "Requests slower than 2s detected"
+    conditionThreshold:
+      filter: |
+        resource.type = "cloud_run_revision"
+        resource.labels.service_name = "shroomp-backend"
+        metric.type = "logging.googleapis.com/user/slow_request_latency"
+      aggregations:
+        - alignmentPeriod: 60s
+          perSeriesAligner: ALIGN_DELTA
+          crossSeriesReducer: REDUCE_COUNT
+      comparison: COMPARISON_GT
+      thresholdValue: 0
+      duration: 60s
+combiner: OR
+notificationChannels: []
+alertStrategy:
+  autoClose: 3600s  # 1 hour

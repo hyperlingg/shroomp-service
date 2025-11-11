@@ -1,0 +1,33 @@
+displayName: "High Latency Alert - Shroomp Backend"
+documentation:
+  content: |
+    The 95th percentile latency for shroomp-backend has exceeded 1 second.
+
+    ## Action Items:
+    1. Check Cloud Run logs for errors
+    2. Review recent deployments
+    3. Check if database/storage is slow
+    4. Monitor request volume for unusual spikes
+
+    Dashboard: https://console.cloud.google.com/monitoring
+  mimeType: text/markdown
+conditions:
+  - displayName: "P95 latency > 1s"
+    conditionThreshold:
+      filter: |
+        resource.type = "cloud_run_revision"
+        resource.labels.service_name = "shroomp-backend"
+        metric.type = "logging.googleapis.com/user/all_request_latency"
+      aggregations:
+        - alignmentPeriod: 60s
+          perSeriesAligner: ALIGN_DELTA
+          crossSeriesReducer: REDUCE_PERCENTILE_95
+          groupByFields:
+            - resource.service_name
+      comparison: COMPARISON_GT
+      thresholdValue: 1.0
+      duration: 120s
+combiner: OR
+notificationChannels: []
+alertStrategy:
+  autoClose: 604800s  # 7 days
