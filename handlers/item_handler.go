@@ -110,7 +110,11 @@ func (h *ItemHandler) createItem(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusCreated)
-	json.NewEncoder(w).Encode(item)
+	if err := json.NewEncoder(w).Encode(item); err != nil {
+		logger.Error("Failed to encode response", map[string]interface{}{
+			"error": err.Error(),
+		})
+	}
 }
 
 // getAllItems retrieves all items
@@ -118,7 +122,11 @@ func (h *ItemHandler) getAllItems(w http.ResponseWriter, r *http.Request) {
 	items := h.store.GetAll()
 
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(items)
+	if err := json.NewEncoder(w).Encode(items); err != nil {
+		logger.Error("Failed to encode response", map[string]interface{}{
+			"error": err.Error(),
+		})
+	}
 }
 
 // getItem retrieves a specific item by ID
@@ -138,7 +146,11 @@ func (h *ItemHandler) getItem(w http.ResponseWriter, r *http.Request, id string)
 	}
 
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(item)
+	if err := json.NewEncoder(w).Encode(item); err != nil {
+		logger.Error("Failed to encode response", map[string]interface{}{
+			"error": err.Error(),
+		})
+	}
 }
 
 // updateItem updates an existing item
@@ -175,7 +187,11 @@ func (h *ItemHandler) updateItem(w http.ResponseWriter, r *http.Request, id stri
 	}
 
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(item)
+	if err := json.NewEncoder(w).Encode(item); err != nil {
+		logger.Error("Failed to encode response", map[string]interface{}{
+			"error": err.Error(),
+		})
+	}
 }
 
 // deleteItem removes an item

@@ -78,7 +78,9 @@ func TestStore_Get(t *testing.T) {
 		DateTime: now,
 	}
 
-	store.Create(item)
+	if err := store.Create(item); err != nil {
+		t.Fatalf("Create failed: %v", err)
+	}
 
 	retrieved, err := store.Get(item.ID)
 	if err != nil {
@@ -112,7 +114,9 @@ func TestStore_GetAll(t *testing.T) {
 	}
 
 	for _, item := range items {
-		store.Create(item)
+		if err := store.Create(item); err != nil {
+			t.Fatalf("Create failed: %v", err)
+		}
 	}
 
 	allItems := store.GetAll()
@@ -156,7 +160,9 @@ func TestStore_Update(t *testing.T) {
 		DateTime:     now,
 	}
 
-	store.Create(item)
+	if err := store.Create(item); err != nil {
+		t.Fatalf("Create failed: %v", err)
+	}
 
 	updatedItem := models.Item{
 		ID:           "test-1",
@@ -213,7 +219,9 @@ func TestStore_Delete(t *testing.T) {
 		DateTime: now,
 	}
 
-	store.Create(item)
+	if err := store.Create(item); err != nil {
+		t.Fatalf("Create failed: %v", err)
+	}
 
 	err := store.Delete(item.ID)
 	if err != nil {
@@ -294,7 +302,9 @@ func TestStore_PersistenceEmptyFile(t *testing.T) {
 	defer os.Remove(testFile)
 
 	// Create empty file
-	os.WriteFile(testFile, []byte{}, 0644)
+	if err := os.WriteFile(testFile, []byte{}, 0644); err != nil {
+		t.Fatalf("WriteFile failed: %v", err)
+	}
 
 	store := &Store{
 		items:    make(map[string]models.Item),
