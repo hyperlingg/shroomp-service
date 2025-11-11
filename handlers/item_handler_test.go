@@ -13,16 +13,14 @@ import (
 )
 
 func createTestHandler(t *testing.T) (*ItemHandler, func()) {
-	testFile := "test_handler_" + t.Name() + ".json"
-	store := &storage.Store{}
-	// Initialize store with test file
-	os.Remove(testFile) // Clean up any existing test file
+	// Clean up any existing test file
+	os.Remove("data.json") // NewStore uses "data.json" as default
 
-	store = storage.NewStore()
+	store := storage.NewStore()
 	handler := NewItemHandler(store)
 
 	cleanup := func() {
-		os.Remove("data.json") // NewStore uses "data.json" as default
+		os.Remove("data.json")
 	}
 
 	return handler, cleanup
@@ -147,7 +145,9 @@ func TestHandleItems_GET_Success(t *testing.T) {
 	}
 
 	for _, item := range items {
-		handler.store.Create(item)
+		if err := handler.store.Create(item); err != nil {
+			t.Fatalf("Failed to create test item: %v", err)
+		}
 	}
 
 	req := httptest.NewRequest(http.MethodGet, "/items", nil)
@@ -198,7 +198,9 @@ func TestHandleItemByID_GET_Success(t *testing.T) {
 		UpdatedAt:    now,
 	}
 
-	handler.store.Create(item)
+	if err := handler.store.Create(item); err != nil {
+		t.Fatalf("Failed to create test item: %v", err)
+	}
 
 	req := httptest.NewRequest(http.MethodGet, "/items/test-1", nil)
 	w := httptest.NewRecorder()
@@ -248,7 +250,9 @@ func TestHandleItemByID_PUT_Success(t *testing.T) {
 		UpdatedAt:    now,
 	}
 
-	handler.store.Create(item)
+	if err := handler.store.Create(item); err != nil {
+		t.Fatalf("Failed to create test item: %v", err)
+	}
 
 	updatedItem := models.Item{
 		MushroomName: "Updated",
@@ -317,7 +321,9 @@ func TestHandleItemByID_PUT_ValidationError(t *testing.T) {
 		UpdatedAt:    now,
 	}
 
-	handler.store.Create(item)
+	if err := handler.store.Create(item); err != nil {
+		t.Fatalf("Failed to create test item: %v", err)
+	}
 
 	invalidItem := models.Item{
 		Location: "", // Invalid: empty location
@@ -367,7 +373,9 @@ func TestHandleItemByID_DELETE_Success(t *testing.T) {
 		UpdatedAt:    now,
 	}
 
-	handler.store.Create(item)
+	if err := handler.store.Create(item); err != nil {
+		t.Fatalf("Failed to create test item: %v", err)
+	}
 
 	req := httptest.NewRequest(http.MethodDelete, "/items/test-1", nil)
 	w := httptest.NewRecorder()
