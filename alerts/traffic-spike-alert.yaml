@@ -31,6 +31,7 @@ conditions:
       thresholdValue: 2.0  # Low threshold for demo/testing (requests/second)
       duration: 60s  # Reduced to 1 minute for faster demo
 combiner: OR
-notificationChannels: []
+notificationChannels:
+  - projects/shroomp/notificationChannels/3358868905534893884
 alertStrategy:
   autoClose: 1800s  # 30 minutes

@@ -39,6 +39,7 @@ conditions:
       thresholdValue: 0
       duration: 60s
 combiner: OR
-notificationChannels: []
+notificationChannels:
+  - projects/shroomp/notificationChannels/3358868905534893884
 alertStrategy:
   autoClose: 3600s  # 1 hour
