@@ -75,28 +75,40 @@ func TestHandleItems_POST_ValidationError(t *testing.T) {
 		expected string
 	}{
 		{
-			name: "missing location",
+			name: "missing mushroomName",
 			item: models.Item{
+				Location: "Forest",
 				Count:    5,
 				DateTime: time.Now(),
+			},
+			expected: "mushroomName is required",
+		},
+		{
+			name: "missing location",
+			item: models.Item{
+				MushroomName: "Chanterelle",
+				Count:        5,
+				DateTime:     time.Now(),
 			},
 			expected: "location is required",
 		},
 		{
 			name: "invalid count",
 			item: models.Item{
-				Location: "Forest",
-				Count:    0,
-				DateTime: time.Now(),
+				MushroomName: "Chanterelle",
+				Location:     "Forest",
+				Count:        0,
+				DateTime:     time.Now(),
 			},
 			expected: "count must be at least 1",
 		},
 		{
 			name: "missing dateTime",
 			item: models.Item{
-				Location: "Forest",
-				Count:    5,
-				DateTime: time.Time{},
+				MushroomName: "Chanterelle",
+				Location:     "Forest",
+				Count:        5,
+				DateTime:     time.Time{},
 			},
 			expected: "dateTime is required",
 		},
@@ -444,36 +456,50 @@ func TestValidateSighting(t *testing.T) {
 		{
 			name: "valid item",
 			item: models.Item{
-				Location: "Forest",
-				Count:    5,
-				DateTime: time.Now(),
+				MushroomName: "Chanterelle",
+				Location:     "Forest",
+				Count:        5,
+				DateTime:     time.Now(),
 			},
 			expectErr: false,
 		},
 		{
+			name: "empty mushroomName",
+			item: models.Item{
+				MushroomName: "",
+				Location:     "Forest",
+				Count:        5,
+				DateTime:     time.Now(),
+			},
+			expectErr: true,
+		},
+		{
 			name: "empty location",
 			item: models.Item{
-				Location: "",
-				Count:    5,
-				DateTime: time.Now(),
+				MushroomName: "Chanterelle",
+				Location:     "",
+				Count:        5,
+				DateTime:     time.Now(),
 			},
 			expectErr: true,
 		},
 		{
 			name: "count zero",
 			item: models.Item{
-				Location: "Forest",
-				Count:    0,
-				DateTime: time.Now(),
+				MushroomName: "Chanterelle",
+				Location:     "Forest",
+				Count:        0,
+				DateTime:     time.Now(),
 			},
 			expectErr: true,
 		},
 		{
 			name: "zero dateTime",
 			item: models.Item{
-				Location: "Forest",
-				Count:    5,
-				DateTime: time.Time{},
+				MushroomName: "Chanterelle",
+				Location:     "Forest",
+				Count:        5,
+				DateTime:     time.Time{},
 			},
 			expectErr: true,
 		},

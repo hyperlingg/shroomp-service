@@ -57,6 +57,9 @@ func (h *ItemHandler) HandleItemByID(w http.ResponseWriter, r *http.Request) {
 
 // validateSighting validates required fields for a mushroom sighting
 func validateSighting(item *models.Item) error {
+	if item.MushroomName == "" {
+		return errors.New("mushroomName is required")
+	}
 	if item.Location == "" {
 		return errors.New("location is required")
 	}
